@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff } from "lucide-react";
 import { Github } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import voroLogo from "@/assets/voro-logo.png";
 
 const Login = () => {
@@ -15,11 +17,39 @@ const Login = () => {
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  const { signIn, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This will be implemented when Supabase is connected
-    console.log("Login attempt:", formData);
+    setLoading(true);
+    
+    const { error } = await signIn(formData.email, formData.password);
+    
+    if (error) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "Successfully logged in",
+      });
+      navigate("/");
+    }
+    
+    setLoading(false);
   };
 
   const handleGoogleLogin = () => {
@@ -140,9 +170,9 @@ const Login = () => {
                 variant="gradient"
                 size="lg"
                 className="w-full"
-                disabled={!formData.email || !formData.password}
+                disabled={!formData.email || !formData.password || loading}
               >
-                Login
+                {loading ? "Signing In..." : "Login"}
               </Button>
 
               <div className="text-center text-sm">

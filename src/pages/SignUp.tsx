@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Check, X } from "lucide-react";
 import { Github } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import voroLogo from "@/assets/voro-logo.png";
 
 const SignUp = () => {
@@ -18,6 +20,11 @@ const SignUp = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  const { signUp } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const getPasswordStrength = (password: string) => {
     let strength = 0;
@@ -36,10 +43,37 @@ const SignUp = () => {
   const strengthLabels = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
   const strengthColors = ["bg-destructive", "bg-orange-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This will be implemented when Supabase is connected
-    console.log("Sign up attempt:", formData);
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    const { error } = await signUp(formData.email, formData.password, formData.name);
+    
+    if (error) {
+      toast({
+        title: "Sign up failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success!",
+        description: "Please check your email to verify your account",
+      });
+      navigate("/login");
+    }
+    
+    setLoading(false);
   };
 
   const handleGoogleSignUp = () => {
@@ -226,9 +260,9 @@ const SignUp = () => {
                 variant="gradient"
                 size="lg"
                 className="w-full"
-                disabled={!formData.name || !formData.email || !formData.password || formData.password !== formData.confirmPassword}
+                disabled={!formData.name || !formData.email || !formData.password || formData.password !== formData.confirmPassword || loading}
               >
-                Sign Up
+                {loading ? "Creating Account..." : "Sign Up"}
               </Button>
 
               <div className="text-center text-sm">
