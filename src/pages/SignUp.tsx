@@ -115,11 +115,14 @@ const SignUp = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 form-fade-in">
-          <img 
-            src={voroLogo} 
-            alt="Voro" 
-            className="w-32 h-auto mx-auto mb-4"
-          />
+          <div className="mb-4">
+            <h1 className="text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2 tracking-tight">
+              Voro
+            </h1>
+            <div className="text-sm font-medium text-accent uppercase tracking-widest">
+              Innovation Platform
+            </div>
+          </div>
           <p className="text-muted-foreground">Join the community</p>
         </div>
 
