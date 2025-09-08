@@ -87,7 +87,11 @@ const Login = () => {
   return <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 form-fade-in">
-          
+          <img 
+            src={voroLogo} 
+            alt="Voro" 
+            className="w-32 h-auto mx-auto mb-4"
+          />
           <p className="text-muted-foreground">Welcome back</p>
         </div>
 
