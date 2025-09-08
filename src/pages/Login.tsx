@@ -9,6 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Github } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import voroLogo from "@/assets/voro-logo.png";
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const Login = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/categories");
     }
   }, [user, navigate]);
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,17 +48,41 @@ const Login = () => {
         title: "Welcome back!",
         description: "Successfully logged in"
       });
-      navigate("/");
+      navigate("/categories");
     }
     setLoading(false);
   };
-  const handleGoogleLogin = () => {
-    // This will be implemented when Supabase OAuth is configured
-    console.log("Google login");
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/categories`
+      }
+    });
+    
+    if (error) {
+      toast({
+        title: "OAuth Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
-  const handleGithubLogin = () => {
-    // This will be implemented when Supabase OAuth is configured
-    console.log("GitHub login");
+  const handleGithubLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/categories`
+      }
+    });
+    
+    if (error) {
+      toast({
+        title: "OAuth Error", 
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
   return <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">

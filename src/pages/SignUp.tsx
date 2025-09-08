@@ -9,6 +9,7 @@ import { Eye, EyeOff, Check, X } from "lucide-react";
 import { Github } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import voroLogo from "@/assets/voro-logo.png";
 
 const SignUp = () => {
@@ -76,14 +77,38 @@ const SignUp = () => {
     setLoading(false);
   };
 
-  const handleGoogleSignUp = () => {
-    // This will be implemented when Supabase OAuth is configured
-    console.log("Google sign up");
+  const handleGoogleSignUp = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/categories`
+      }
+    });
+    
+    if (error) {
+      toast({
+        title: "OAuth Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleGithubSignUp = () => {
-    // This will be implemented when Supabase OAuth is configured
-    console.log("GitHub sign up");
+  const handleGithubSignUp = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github', 
+      options: {
+        redirectTo: `${window.location.origin}/categories`
+      }
+    });
+    
+    if (error) {
+      toast({
+        title: "OAuth Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   return (
