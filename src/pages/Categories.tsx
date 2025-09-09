@@ -30,9 +30,9 @@ const Categories = () => {
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         <SidebarInset className="flex-1">
-          <header className="flex h-16 items-center border-b px-4">
+          <header className="flex h-16 items-center border-b border-border bg-background px-4">
             <SidebarTrigger className="mr-4" />
-            <h1 className="text-xl font-semibold">Business Categories</h1>
+            <h1 className="text-xl font-semibold text-foreground">Business Categories</h1>
           </header>
           <main className="p-6">
             <div className="max-w-4xl mx-auto">
