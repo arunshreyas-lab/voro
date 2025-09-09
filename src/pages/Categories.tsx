@@ -85,15 +85,3 @@ const Categories = () => {
 };
 
 export default Categories;
-
-                </div>
-              </div>
-            </div>
-          </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
-  );
-};
-
-export default Categories;
