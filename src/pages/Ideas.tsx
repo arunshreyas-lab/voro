@@ -1,32 +1,14 @@
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lightbulb, Plus, LogOut } from "lucide-react";
+import { Lightbulb, Plus } from "lucide-react";
 
 const Ideas = () => {
-  const handleLogout = () => {
-    // This will be implemented when Supabase is connected
-    console.log("Logout");
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Voro
-            </h1>
-          </div>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut size={16} />
-            Logout
-          </Button>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-background pl-16">
+      <Navbar />
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 transition-all duration-300">
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12 form-fade-in">

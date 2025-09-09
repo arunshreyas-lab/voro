@@ -1,28 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
-  Menu, 
   Home, 
   Lightbulb, 
   Settings, 
   LogOut, 
-  User,
-  X
+  Menu
 } from "lucide-react";
 
 export const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
-    setIsOpen(false);
   };
 
   const getUserInitials = (email: string) => {
@@ -40,126 +36,91 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link to="/categories" className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Voro
-            </h1>
-          </Link>
+    <div 
+      className="fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Collapsed State - Always Visible */}
+      <div className={`h-full bg-background/95 backdrop-blur-sm border-r border-border transition-all duration-300 ${
+        isHovered ? 'w-64' : 'w-16'
+      }`}>
+        
+        {/* Header */}
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center flex-shrink-0">
+              <Menu className="w-4 h-4 text-white" />
+            </div>
+            <div className={`ml-3 transition-all duration-300 ${
+              isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            }`}>
+              <h1 className="text-lg font-bold bg-gradient-primary bg-clip-text text-transparent whitespace-nowrap">
+                Voro
+              </h1>
+            </div>
+          </div>
+        </div>
 
-          {/* Desktop Navigation - Hidden on mobile */}
-          <div className="hidden md:flex items-center space-x-6">
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <item.icon className="w-4 h-4" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
-            
-            {/* User Avatar */}
-            <div className="flex items-center space-x-3">
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback className="bg-accent text-accent-foreground text-sm">
-                  {user?.email ? getUserInitials(user.email) : "U"}
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSignOut}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
+        {/* Navigation Items */}
+        <div className="p-4 space-y-2">
+          {menuItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className="flex items-center p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-all duration-200 group"
+            >
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              <span className={`ml-3 transition-all duration-300 whitespace-nowrap ${
+                isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+              }`}>
+                {item.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* User Section - Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
+          {/* User Info */}
+          <div className="flex items-center mb-3">
+            <Avatar className="w-8 h-8 flex-shrink-0">
+              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarFallback className="bg-accent text-accent-foreground text-sm">
+                {user?.email ? getUserInitials(user.email) : "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className={`ml-3 transition-all duration-300 min-w-0 ${
+              isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            }`}>
+              <p className="font-medium text-foreground truncate text-sm">
+                {user?.user_metadata?.full_name || (user?.email ? getUserDisplayName(user.email) : "User")}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email}
+              </p>
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="w-5 h-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80 p-0">
-              <div className="flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-border">
-                  <h2 className="text-lg font-semibold bg-gradient-primary bg-clip-text text-transparent">
-                    Voro
-                  </h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
-
-                {/* User Info */}
-                <div className="p-6 border-b border-border">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={user?.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-accent text-accent-foreground">
-                        {user?.email ? getUserInitials(user.email) : "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">
-                        {user?.user_metadata?.full_name || (user?.email ? getUserDisplayName(user.email) : "User")}
-                      </p>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation Links */}
-                <div className="flex-1 p-6">
-                  <nav className="space-y-2">
-                    {menuItems.map((item) => (
-                      <Link
-                        key={item.href}
-                        to={item.href}
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-colors"
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.label}</span>
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
-
-                {/* Footer */}
-                <div className="p-6 border-t border-border">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-muted-foreground hover:text-destructive"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="w-5 h-5 mr-3" />
-                    Sign Out
-                  </Button>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+          {/* Sign Out Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="w-full justify-start text-muted-foreground hover:text-destructive p-3"
+          >
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            <span className={`ml-3 transition-all duration-300 whitespace-nowrap ${
+              isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            }`}>
+              Sign Out
+            </span>
+          </Button>
         </div>
       </div>
-    </nav>
+
+      {/* Hover Trigger Area - Invisible area to make hover easier */}
+      <div className="absolute left-0 top-0 w-2 h-full" />
+    </div>
   );
 };
