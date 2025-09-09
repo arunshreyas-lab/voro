@@ -1,72 +1,65 @@
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  ShoppingCart, 
+  Utensils, 
+  Car, 
+  Home, 
+  Heart, 
+  Palette, 
+  Laptop, 
+  Building2,
+  ChevronRight 
+} from "lucide-react";
+
+const businessCategories = [
+  { title: "Retail & E-commerce", icon: ShoppingCart, url: "/categories/retail" },
+  { title: "Food & Beverage", icon: Utensils, url: "/categories/food" },
+  { title: "Automotive", icon: Car, url: "/categories/automotive" },
+  { title: "Real Estate", icon: Home, url: "/categories/realestate" },
+  { title: "Healthcare", icon: Heart, url: "/categories/healthcare" },
+  { title: "Creative Services", icon: Palette, url: "/categories/creative" },
+  { title: "Technology", icon: Laptop, url: "/categories/technology" },
+  { title: "Construction", icon: Building2, url: "/categories/construction" },
+];
 
 const Categories = () => {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         <SidebarInset className="flex-1">
+          <header className="flex h-16 items-center border-b px-4">
+            <SidebarTrigger className="mr-4" />
+            <h1 className="text-xl font-semibold">Business Categories</h1>
+          </header>
           <main className="p-6">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               <div className="mb-8">
                 <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  Business Categories
+                  Explore Business Categories
                 </h1>
                 <p className="text-muted-foreground text-lg">
-                  Explore different business categories and discover opportunities
+                  Choose from our comprehensive list of business categories
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>Featured Categories</span>
-                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                        <span className="text-accent">★</span>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Discover the most popular business categories and trending opportunities.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>Growth Sectors</span>
-                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                        <span className="text-accent">📈</span>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Explore rapidly growing business sectors with high potential.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>Innovation Hub</span>
-                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                        <span className="text-accent">💡</span>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      Cutting-edge business ideas and innovative solutions.
-                    </p>
-                  </CardContent>
-                </Card>
+              <div className="space-y-4">
+                {businessCategories.map((category) => (
+                  <div
+                    key={category.title}
+                    className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <category.icon className="w-6 h-6 text-accent" />
+                      <span className="font-medium text-foreground">
+                        {category.title}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                  </div>
+                ))}
               </div>
 
               <div className="mt-12">
