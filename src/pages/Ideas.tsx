@@ -105,9 +105,9 @@ const Ideas = () => {
         caption: caption.trim(),
         description: postType === 'post' ? description.trim() || undefined : undefined,
         category,
-        // For now, we'll store placeholder URLs. In a real app, you'd upload files to storage first
-        image_url: postType === 'post' && selectedImage ? '/placeholder.svg' : undefined,
-        video_url: postType === 'spark' && selectedVideo ? '/placeholder.svg' : undefined,
+        // Create object URLs for the uploaded files to display them immediately
+        image_url: postType === 'post' && selectedImage ? URL.createObjectURL(selectedImage) : undefined,
+        video_url: postType === 'spark' && selectedVideo ? URL.createObjectURL(selectedVideo) : undefined,
       };
 
       const success = await createPost(postData);
@@ -147,8 +147,7 @@ const Ideas = () => {
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-sm">{post.user?.name}</h4>
-              <span className="text-xs text-muted-foreground">{post.user?.username}</span>
+              <h4 className="font-semibold text-sm">{post.user?.username}</h4>
               <span className="text-xs text-muted-foreground">•</span>
               <span className="text-xs text-muted-foreground">{formatTimestamp(post.created_at)}</span>
             </div>
@@ -174,9 +173,13 @@ const Ideas = () => {
           {post.type === 'post' && post.image_url && (
             <div className="rounded-lg overflow-hidden bg-muted">
               <img 
-                src={post.image_url} 
+                src={post.image_url || '/placeholder.svg'} 
                 alt="Post content" 
                 className="w-full h-64 object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder.svg';
+                }}
               />
             </div>
           )}
@@ -184,10 +187,24 @@ const Ideas = () => {
           {post.type === 'spark' && (
             <div className="flex justify-center">
               <div className="relative w-64 h-96 rounded-lg overflow-hidden bg-muted">
-                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                {post.video_url ? (
+                  <video 
+                    src={post.video_url} 
+                    className="w-full h-full object-cover"
+                    controls
+                    onError={(e) => {
+                      const target = e.target as HTMLVideoElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center" style={{ display: post.video_url ? 'none' : 'flex' }}>
                   <div className="text-center">
                     <Video size={48} className="mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">Voro Spark</p>
+                  </div>
                   </div>
                 </div>
               </div>

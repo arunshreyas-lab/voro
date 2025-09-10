@@ -52,9 +52,9 @@ export const usePosts = () => {
       const transformedPosts: Post[] = data.map(post => ({
         ...post,
         user: {
-          name: 'User', // We'll enhance this later with user profiles
+          name: post.user_id.slice(0, 8), // Use part of user ID as display name for now
           avatar: '/placeholder.svg',
-          username: `@user${post.user_id.slice(0, 8)}`
+          username: `@${post.user_id.slice(0, 8)}`
         }
       }));
 
@@ -104,7 +104,7 @@ export const usePosts = () => {
       const newPost: Post = {
         ...data,
         user: {
-          name: user.user_metadata?.full_name || 'You',
+          name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'You',
           avatar: user.user_metadata?.avatar_url || '/placeholder.svg',
           username: `@${user.email?.split('@')[0] || 'you'}`
         }
