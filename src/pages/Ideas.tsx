@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -8,8 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Lightbulb, Plus, Heart, MessageCircle, Send, Image as ImageIcon, Video, Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-const mockPosts = [
+type Post = {
+  id: number;
+  type: 'post' | 'spark';
+  user: { name: string; avatar: string; username: string };
+  caption: string;
+  description?: string;
+  image?: string;
+  videoUrl?: string;
+  likes: number;
+  comments: number;
+  timestamp: string;
+};
+
+const mockPosts: Post[] = [
   {
     id: 1,
     type: 'post',
@@ -48,8 +62,91 @@ const Ideas = () => {
   const [postType, setPostType] = useState<'post' | 'spark'>('post');
   const [caption, setCaption] = useState('');
   const [description, setDescription] = useState('');
+  const [posts, setPosts] = useState<Post[]>(mockPosts);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
-  const PostCard = ({ post }: { post: typeof mockPosts[0] }) => (
+  const handleLike = (postId: number) => {
+    setPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? { ...post, likes: post.likes + 1 }
+        : post
+    ));
+    toast({
+      description: "Post liked!",
+    });
+  };
+
+  const handleComment = (postId: number) => {
+    toast({
+      description: "Comment feature coming soon!",
+    });
+  };
+
+  const handleContact = (username: string) => {
+    toast({
+      description: `Contacting ${username}...`,
+    });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      toast({
+        description: "Image selected successfully!",
+      });
+    }
+  };
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedVideo(file);
+      toast({
+        description: "Video selected successfully!",
+      });
+    }
+  };
+
+  const handleCreatePost = () => {
+    if (!caption.trim()) {
+      toast({
+        variant: "destructive",
+        description: "Please add a caption for your post.",
+      });
+      return;
+    }
+
+    const newPost: Post = {
+      id: posts.length + 1,
+      type: postType,
+      user: { name: 'You', avatar: '/placeholder.svg', username: '@you' },
+      caption,
+      description: postType === 'post' ? description : undefined,
+      image: postType === 'post' && selectedImage ? URL.createObjectURL(selectedImage) : undefined,
+      videoUrl: postType === 'spark' && selectedVideo ? URL.createObjectURL(selectedVideo) : undefined,
+      likes: 0,
+      comments: 0,
+      timestamp: 'now'
+    };
+
+    setPosts(prev => [newPost, ...prev]);
+    setIsCreateModalOpen(false);
+    setCaption('');
+    setDescription('');
+    setSelectedImage(null);
+    setSelectedVideo(null);
+    
+    toast({
+      description: `${postType === 'post' ? 'Post' : 'Voro Spark'} created successfully!`,
+    });
+  };
+
+  const PostCard = ({ post }: { post: Post }) => (
     <Card className="shadow-card border-border hover:shadow-glow transition-all duration-300 mb-6">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
@@ -65,7 +162,12 @@ const Ideas = () => {
               <span className="text-xs text-muted-foreground">{post.timestamp}</span>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="h-8 px-3">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-3"
+            onClick={() => handleContact(post.user.username)}
+          >
             <Send size={16} />
           </Button>
         </div>
@@ -101,11 +203,21 @@ const Ideas = () => {
           )}
           
           <div className="flex items-center gap-4 pt-2">
-            <Button variant="ghost" size="sm" className="gap-2 h-8 px-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2 h-8 px-2 hover:text-red-500 transition-colors"
+              onClick={() => handleLike(post.id)}
+            >
               <Heart size={16} />
               <span className="text-sm">{post.likes}</span>
             </Button>
-            <Button variant="ghost" size="sm" className="gap-2 h-8 px-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2 h-8 px-2"
+              onClick={() => handleComment(post.id)}
+            >
               <MessageCircle size={16} />
               <span className="text-sm">{post.comments}</span>
             </Button>
@@ -172,9 +284,21 @@ const Ideas = () => {
                 
                 <div>
                   <Label>Image (optional)</Label>
-                  <Button variant="outline" className="w-full gap-2 h-24 flex-col">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    ref={imageInputRef}
+                    className="hidden"
+                  />
+                  <Button 
+                    variant="outline" 
+                    className="w-full gap-2 h-24 flex-col"
+                    onClick={() => imageInputRef.current?.click()}
+                    type="button"
+                  >
                     <Upload size={24} />
-                    <span>Click to upload image</span>
+                    <span>{selectedImage ? selectedImage.name : 'Click to upload image'}</span>
                   </Button>
                 </div>
               </>
@@ -183,9 +307,21 @@ const Ideas = () => {
             {postType === 'spark' && (
               <div>
                 <Label>Video (9:16 format)</Label>
-                <Button variant="outline" className="w-full gap-2 h-32 flex-col">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  ref={videoInputRef}
+                  className="hidden"
+                />
+                <Button 
+                  variant="outline" 
+                  className="w-full gap-2 h-32 flex-col"
+                  onClick={() => videoInputRef.current?.click()}
+                  type="button"
+                >
                   <Video size={32} />
-                  <span>Upload vertical video</span>
+                  <span>{selectedVideo ? selectedVideo.name : 'Upload vertical video'}</span>
                   <span className="text-xs text-muted-foreground">Recommended: 9:16 aspect ratio</span>
                 </Button>
               </div>
@@ -203,12 +339,7 @@ const Ideas = () => {
             <Button 
               variant="gradient" 
               className="flex-1"
-              onClick={() => {
-                // Handle post creation
-                setIsCreateModalOpen(false);
-                setCaption('');
-                setDescription('');
-              }}
+              onClick={handleCreatePost}
             >
               Share {postType === 'post' ? 'Post' : 'Spark'}
             </Button>
@@ -247,13 +378,13 @@ const Ideas = () => {
 
           {/* Feed */}
           <div className="form-slide-up">
-            {mockPosts.map(post => (
+            {posts.map(post => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
 
           {/* Empty State for new users */}
-          {mockPosts.length === 0 && (
+          {posts.length === 0 && (
             <div className="text-center mt-16 p-8">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                 <Lightbulb className="text-muted-foreground" size={24} />

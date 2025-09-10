@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Ideas from "./pages/Ideas";
 import Categories from "./pages/Categories";
+import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/ideas" element={<Ideas />} />
+            <Route path="/settings" element={<SettingsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
