@@ -138,6 +138,14 @@ const Ideas = () => {
   };
 
   const PostCard = ({ post }: { post: Post }) => (
+    const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      const target = e.target as HTMLVideoElement;
+      target.style.display = 'none';
+      const fallback = target.nextElementSibling as HTMLElement;
+      if (fallback) fallback.style.display = 'flex';
+    };
+
+    return (
     <Card className="shadow-card border-border hover:shadow-glow transition-all duration-300 mb-6">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
@@ -192,12 +200,7 @@ const Ideas = () => {
                     src={post.video_url} 
                     className="w-full h-full object-cover"
                     controls
-                    onError={(e) => {
-                      const target = e.target as HTMLVideoElement;
-                      target.style.display = 'none';
-                      const fallback = target.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
-                    }}
+                    onError={handleVideoError}
                   />
                 ) : null}
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center" style={{ display: post.video_url ? 'none' : 'flex' }}>
@@ -234,7 +237,8 @@ const Ideas = () => {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   const CreatePostModal = () => (
     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
