@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -120,6 +120,9 @@ const Ideas = () => {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Create New {postType === 'post' ? 'Post' : 'Voro Spark'}</DialogTitle>
+          <DialogDescription>
+            Share your ideas with the community through {postType === 'post' ? 'a simple post with text and optional image' : 'a vertical video (Voro Spark)'}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="flex gap-2">
@@ -231,14 +234,15 @@ const Ideas = () => {
             <p className="text-muted-foreground mb-6">
               Share your ideas and discover inspiration from others
             </p>
-            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-              <DialogTrigger asChild>
-                <Button variant="gradient" size="lg" className="gap-2">
-                  <Plus size={20} />
-                  Create
-                </Button>
-              </DialogTrigger>
-            </Dialog>
+            <Button 
+              variant="gradient" 
+              size="lg" 
+              className="gap-2"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
+              <Plus size={20} />
+              Create
+            </Button>
           </div>
 
           {/* Feed */}
