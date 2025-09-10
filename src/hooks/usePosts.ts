@@ -82,6 +82,9 @@ export const usePosts = () => {
     }
 
     try {
+      console.log('Creating post with data:', postData);
+      console.log('User ID:', user.id);
+      
       const { data, error } = await supabase
         .from('posts')
         .insert([
@@ -94,6 +97,8 @@ export const usePosts = () => {
         .single();
 
       if (error) throw error;
+      
+      console.log('Post created successfully:', data);
 
       // Add the new post to the local state
       const newPost: Post = {
