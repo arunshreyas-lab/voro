@@ -207,79 +207,87 @@ const Ideas = () => {
 
       {/* Posts Feed */}
       <div className="space-y-4">
-        {posts.map((post) => (
-          <Card key={post.id} className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={post.profiles?.avatar_url || ''} />
-                  <AvatarFallback>
-                    {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="font-semibold">
-                    @{post.profiles?.username || 'anonymous'}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-                <Badge variant={post.type === 'spark' ? 'secondary' : 'default'}>
-                  {post.type === 'spark' ? 'Voro Spark' : 'Post'}
-                </Badge>
-              </div>
-            </CardHeader>
+        {posts.map((post) => {
+          // Determine valid avatar URL or undefined if empty/invalid
+          const avatarSrc =
+            post.profiles?.avatar_url && post.profiles.avatar_url.trim() !== ''
+              ? post.profiles.avatar_url
+              : undefined;
 
-            <CardContent className="space-y-3">
-              <div>
-                <h3 className="font-semibold text-lg">{post.caption}</h3>
-                {post.description && (
-                  <p className="text-gray-600 mt-1">{post.description}</p>
+          return (
+            <Card key={post.id} className="overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={avatarSrc} />
+                    <AvatarFallback>
+                      {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="font-semibold">
+                      @{post.profiles?.username || 'anonymous'}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <Badge variant={post.type === 'spark' ? 'secondary' : 'default'}>
+                    {post.type === 'spark' ? 'Voro Spark' : 'Post'}
+                  </Badge>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-lg">{post.caption}</h3>
+                  {post.description && (
+                    <p className="text-gray-600 mt-1">{post.description}</p>
+                  )}
+                </div>
+
+                <Badge variant="outline">{post.category}</Badge>
+
+                {post.image_url && (
+                  <div className="rounded-md overflow-hidden">
+                    <img
+                      src={post.image_url}
+                      alt={post.caption}
+                      className="w-full h-64 object-cover"
+                      onError={handleImageError}
+                    />
+                  </div>
                 )}
-              </div>
 
-              <Badge variant="outline">{post.category}</Badge>
+                {post.video_url && post.type === 'spark' && (
+                  <div className="rounded-md overflow-hidden">
+                    <video
+                      src={post.video_url}
+                      className="w-full h-64 object-cover"
+                      controls
+                      onError={handleVideoError}
+                    />
+                  </div>
+                )}
 
-              {post.image_url && (
-                <div className="rounded-md overflow-hidden">
-                  <img
-                    src={post.image_url}
-                    alt={post.caption}
-                    className="w-full h-64 object-cover"
-                    onError={handleImageError}
-                  />
+                <div className="flex items-center gap-4 pt-2">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Heart className="w-4 h-4" />
+                    <span>{post.likes_count || 0}</span>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{post.comments_count || 0}</span>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </Button>
                 </div>
-              )}
-
-              {post.video_url && post.type === 'spark' && (
-                <div className="rounded-md overflow-hidden">
-                  <video
-                    src={post.video_url}
-                    className="w-full h-64 object-cover"
-                    controls
-                    onError={handleVideoError}
-                  />
-                </div>
-              )}
-
-              <div className="flex items-center gap-4 pt-2">
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                  <Heart className="w-4 h-4" />
-                  <span>{post.likes_count || 0}</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                  <MessageCircle className="w-4 h-4" />
-                  <span>{post.comments_count || 0}</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                  <Share2 className="w-4 h-4" />
-                  Share
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {posts.length === 0 && (
