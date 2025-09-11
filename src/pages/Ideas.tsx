@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const Ideas = () => {
   const { user } = useAuth();
   const { posts, loading, createPost } = usePosts();
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPost, setNewPost] = useState({
     caption: '',
     description: '',
@@ -46,6 +47,7 @@ const Ideas = () => {
         video: null
       });
     } catch (error) {
+        setShowCreateForm(false);
       console.error('Error creating post:', error);
     } finally {
       setIsCreating(false);
@@ -83,127 +85,153 @@ const Ideas = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
-      {/* Create Post Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      {/* Create Button */}
+      {!showCreateForm && (
+        <div className="text-center">
+          <Button 
+            onClick={() => setShowCreateForm(true)}
+            className="flex items-center gap-2"
+            variant="gradient"
+            size="lg"
+          >
             <Plus className="w-5 h-5" />
-            Share Your Ideas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCreatePost} className="space-y-4">
-            <div className="flex gap-2">
+            Create Post
+          </Button>
+        </div>
+      )}
+
+      {/* Create Post Form */}
+      {showCreateForm && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                Share Your Ideas
+              </CardTitle>
               <Button
-                type="button"
-                variant={newPost.type === 'post' ? 'default' : 'outline'}
-                onClick={() => setNewPost(prev => ({ ...prev, type: 'post' }))}
-                className="flex-1"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCreateForm(false)}
               >
-                Post
-              </Button>
-              <Button
-                type="button"
-                variant={newPost.type === 'spark' ? 'default' : 'outline'}
-                onClick={() => setNewPost(prev => ({ ...prev, type: 'spark' }))}
-                className="flex-1"
-              >
-                Voro Spark
+                Cancel
               </Button>
             </div>
-
-            <Input
-              placeholder="What's your idea?"
-              value={newPost.caption}
-              onChange={(e) => setNewPost(prev => ({ ...prev, caption: e.target.value }))}
-              required
-            />
-
-            <Textarea
-              placeholder="Tell us more about it..."
-              value={newPost.description}
-              onChange={(e) => setNewPost(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
-            />
-
-            <Input
-              placeholder="Category"
-              value={newPost.category}
-              onChange={(e) => setNewPost(prev => ({ ...prev, category: e.target.value }))}
-            />
-
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="flex items-center gap-2 cursor-pointer p-2 border rounded-md hover:bg-gray-50">
-                  <Image className="w-4 h-4" />
-                  <span className="text-sm">Add Image</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-              <div className="flex-1">
-                <label className="flex items-center gap-2 cursor-pointer p-2 border rounded-md hover:bg-gray-50">
-                  <Video className="w-4 h-4" />
-                  <span className="text-sm">Add Video</span>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleVideoUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
-
-            {newPost.image && (
-              <div className="relative">
-                <img
-                  src={URL.createObjectURL(newPost.image)}
-                  alt="Preview"
-                  className="w-full h-48 object-cover rounded-md"
-                />
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreatePost} className="space-y-4">
+              <div className="flex gap-2">
                 <Button
                   type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={() => setNewPost(prev => ({ ...prev, image: null }))}
+                  variant={newPost.type === 'post' ? 'default' : 'outline'}
+                  onClick={() => setNewPost(prev => ({ ...prev, type: 'post' }))}
+                  className="flex-1"
                 >
-                  Remove
+                  Post
                 </Button>
-              </div>
-            )}
-
-            {newPost.video && (
-              <div className="relative">
-                <video
-                  src={URL.createObjectURL(newPost.video)}
-                  className="w-full h-48 object-cover rounded-md"
-                  controls
-                />
                 <Button
                   type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={() => setNewPost(prev => ({ ...prev, video: null }))}
+                  variant={newPost.type === 'spark' ? 'default' : 'outline'}
+                  onClick={() => setNewPost(prev => ({ ...prev, type: 'spark' }))}
+                  className="flex-1"
                 >
-                  Remove
+                  Voro Spark
                 </Button>
               </div>
-            )}
 
-            <Button type="submit" disabled={isCreating} className="w-full">
-              {isCreating ? 'Sharing...' : 'Share Idea'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <Input
+                placeholder="What's your idea?"
+                value={newPost.caption}
+                onChange={(e) => setNewPost(prev => ({ ...prev, caption: e.target.value }))}
+                required
+              />
+
+              <Textarea
+                placeholder="Tell us more about it..."
+                value={newPost.description}
+                onChange={(e) => setNewPost(prev => ({ ...prev, description: e.target.value }))}
+                rows={3}
+              />
+
+              <Input
+                placeholder="Category"
+                value={newPost.category}
+                onChange={(e) => setNewPost(prev => ({ ...prev, category: e.target.value }))}
+              />
+
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 border rounded-md hover:bg-gray-50">
+                    <Image className="w-4 h-4" />
+                    <span className="text-sm">Add Image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div className="flex-1">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 border rounded-md hover:bg-gray-50">
+                    <Video className="w-4 h-4" />
+                    <span className="text-sm">Add Video</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {newPost.image && (
+                <div className="relative">
+                  <img
+                    src={URL.createObjectURL(newPost.image)}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-md"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={() => setNewPost(prev => ({ ...prev, image: null }))}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              )}
+
+              {newPost.video && (
+                <div className="relative">
+                  <video
+                    src={URL.createObjectURL(newPost.video)}
+                    className="w-full h-48 object-cover rounded-md"
+                    controls
+                    onError={handleVideoError}
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={() => setNewPost(prev => ({ ...prev, video: null }))}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              )}
+
+              <Button type="submit" disabled={isCreating} className="w-full">
+                {isCreating ? 'Sharing...' : 'Share Idea'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Posts Feed */}
       <div className="space-y-4">
